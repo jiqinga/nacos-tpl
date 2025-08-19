@@ -30,7 +30,7 @@ tempfile = "3.10"
 similar = "2.4"
 md5 = "0.7"
 colored = "2.1"
-openssl = { version = "0.9.109", features = ["vendored"] }
+openssl = { version = "0.10", features = ["vendored"] }
 [dev-dependencies]
 
 [profile.release]
