@@ -213,7 +213,7 @@ jobs:
           install -Dm644 "README.md" "${DPKG_DIR}/usr/share/doc/${DPKG_BASENAME}/README.md"
           
           cat > "${DPKG_DIR}/usr/share/doc/${DPKG_BASENAME}/copyright" <<EOF
-          Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+          Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
           Upstream-Name: ${{ needs.crate_metadata.outputs.name }}
           Source: ${{ needs.crate_metadata.outputs.homepage }}
           
