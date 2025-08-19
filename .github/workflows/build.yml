@@ -78,7 +78,7 @@ jobs:
           case ${{ matrix.job.target }} in
             arm-unknown-linux-*) sudo apt-get -y update ; sudo apt-get -y install gcc-arm-linux-gnueabihf ;;
             aarch64-unknown-linux-gnu) sudo apt-get -y update ; sudo apt-get -y install gcc-aarch64-linux-gnu ;;
-            *-pc-windows-*) cargo install --features vendored-openssl;;
+            *-pc-windows-*) cargo build --features vendored-openssl;;
           esac
 
       - name: 🦀 安装 Rust 工具链
@@ -182,26 +182,11 @@ jobs:
           # Let subsequent steps know where to find the compressed package
           echo "PKG_PATH=${PKG_STAGING}/${PKG_NAME}" >> $GITHUB_OUTPUT
 
-      - name: 📦 生成 Debian 包
-#        https://github.com/ajeetdsouza/zoxide/blob/main/.github/workflows/release.yml
-        if: startsWith(matrix.job.os, 'ubuntu')
-        uses: actions-rs/cargo@v1
-        with:
-          command: deb
-          args: --no-build --no-strip --output=. --target=nacos-tpl
-
       - name: "⬆️ 上传构件：归档包"
         uses: actions/upload-artifact@master
         with:
           name: ${{ steps.package.outputs.PKG_NAME }}
           path: ${{ steps.package.outputs.PKG_PATH }}
-
-      - name: "⬆️ 上传构件：Debian 包"
-        uses: actions/upload-artifact@master
-        if: steps.debian-package.outputs.DPKG_NAME
-        with:
-          name: ${{ steps.debian-package.outputs.DPKG_NAME }}
-          path: ${{ steps.debian-package.outputs.DPKG_PATH }}
 
       - name: 🔎 检查是否需要发布
         id: is-release
@@ -209,11 +194,31 @@ jobs:
         run: |
           unset IS_RELEASE ; if [[ $GITHUB_REF =~ ^refs/tags/v[0-9].* ]]; then IS_RELEASE='true' ; fi
           echo "IS_RELEASE=${IS_RELEASE}" >> $GITHUB_OUTPUT
-
+      - name: 📄 生成变成日志
+        id: changelog
+        uses: mikepenz/release-changelog-builder-action@v5
+        with:
+          configurationJson: |
+            {
+              "template": "#{{CHANGELOG}}\n\n<details>\n<summary>Uncategorized</summary>\n\n#{{UNCATEGORIZED}}\n</details>",
+              "categories": [
+                {
+                    "title": "## 💬 Other",
+                    "labels": ["other"]
+                },
+                {
+                    "title": "## 📦 Dependencies",
+                    "labels": ["dependencies"]
+                }
+              ]
+            }
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: 🚀 发布归档与安装包
         uses: softprops/action-gh-release@v2
         if: steps.is-release.outputs.IS_RELEASE
         with:
+          body: ${{ steps.changelog.outputs.body }}
           files: |
             ${{ steps.package.outputs.PKG_PATH }}
             ${{ steps.debian-package.outputs.DPKG_PATH }}
