@@ -28,7 +28,7 @@ reqwest = { version = "0.12", features = ["json", "gzip", "brotli", "rustls-tls"
 zip = { version = "0.6", default-features = false, features = ["deflate"] }
 tempfile = "3.10"
 similar = "2.4"
-md5 = "0.7"
+md5 = "0.8"
 colored = "2.1"
 
 [dev-dependencies]
