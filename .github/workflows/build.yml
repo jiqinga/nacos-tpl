@@ -167,8 +167,6 @@ jobs:
           # README, LICENSE and CHANGELOG files
           cp "README.md"  "$ARCHIVE_DIR"
           
-          # Man page
-          cp 'doc/${{ needs.crate_metadata.outputs.name }}.1' "$ARCHIVE_DIR"
           
           # Autocompletion files
           cp -r autocomplete "${ARCHIVE_DIR}"
@@ -216,7 +214,6 @@ jobs:
           
           # README and LICENSE
           install -Dm644 "README.md" "${DPKG_DIR}/usr/share/doc/${DPKG_BASENAME}/README.md"
-          gzip -n --best "${DPKG_DIR}/usr/share/doc/${DPKG_BASENAME}/changelog"
           
           cat > "${DPKG_DIR}/usr/share/doc/${DPKG_BASENAME}/copyright" <<EOF
           Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
