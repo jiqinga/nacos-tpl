@@ -78,7 +78,7 @@ jobs:
           case ${{ matrix.job.target }} in
             arm-unknown-linux-*) sudo apt-get -y update ; sudo apt-get -y install gcc-arm-linux-gnueabihf ;;
             aarch64-unknown-linux-gnu) sudo apt-get -y update ; sudo apt-get -y install gcc-aarch64-linux-gnu ;;
-            *-pc-windows-*) sudo cargo install --features vendored-openssl;;
+            *-pc-windows-*) cargo install --features vendored-openssl;;
           esac
 
       - name: 🦀 安装 Rust 工具链
@@ -203,14 +203,11 @@ jobs:
           # Binary
           install -Dm755 "${{ steps.bin.outputs.BIN_PATH }}" "${DPKG_DIR}/usr/bin/${{ steps.bin.outputs.BIN_NAME }}"
           
-          # Man page
-          install -Dm644 'target/${{ matrix.job.target }}/release/build/${{ needs.crate_metadata.outputs.name }}'-*/out/assets/manual/bat.1 "${DPKG_DIR}/usr/share/man/man1/${{ needs.crate_metadata.outputs.name }}.1"
-          gzip -n --best "${DPKG_DIR}/usr/share/man/man1/${{ needs.crate_metadata.outputs.name }}.1"
           
           # Autocompletion files
-          install -Dm644 'target/${{ matrix.job.target }}/release/build/${{ needs.crate_metadata.outputs.name }}'-*/out/assets/completions/bat.bash "${DPKG_DIR}/usr/share/bash-completion/completions/${{ needs.crate_metadata.outputs.name }}"
-          install -Dm644 'target/${{ matrix.job.target }}/release/build/${{ needs.crate_metadata.outputs.name }}'-*/out/assets/completions/bat.fish "${DPKG_DIR}/usr/share/fish/vendor_completions.d/${{ needs.crate_metadata.outputs.name }}.fish"
-          install -Dm644 'target/${{ matrix.job.target }}/release/build/${{ needs.crate_metadata.outputs.name }}'-*/out/assets/completions/bat.zsh "${DPKG_DIR}/usr/share/zsh/vendor-completions/_${{ needs.crate_metadata.outputs.name }}"
+#          install -Dm644 'target/${{ matrix.job.target }}/release/build/${{ needs.crate_metadata.outputs.name }}'-*/out/assets/completions/bat.bash "${DPKG_DIR}/usr/share/bash-completion/completions/${{ needs.crate_metadata.outputs.name }}"
+#          install -Dm644 'target/${{ matrix.job.target }}/release/build/${{ needs.crate_metadata.outputs.name }}'-*/out/assets/completions/bat.fish "${DPKG_DIR}/usr/share/fish/vendor_completions.d/${{ needs.crate_metadata.outputs.name }}.fish"
+#          install -Dm644 'target/${{ matrix.job.target }}/release/build/${{ needs.crate_metadata.outputs.name }}'-*/out/assets/completions/bat.zsh "${DPKG_DIR}/usr/share/zsh/vendor-completions/_${{ needs.crate_metadata.outputs.name }}"
           
           # README and LICENSE
           install -Dm644 "README.md" "${DPKG_DIR}/usr/share/doc/${DPKG_BASENAME}/README.md"
