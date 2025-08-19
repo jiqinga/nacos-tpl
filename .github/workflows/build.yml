@@ -2,6 +2,9 @@ name: 构建与发布二进制
 #https://githubcom/ajeetdsouza/zoxide/blob/main/github/workflows/releaseyml
 #https://githubcom/svenstaro/genact/blob/master/:github/workflows/build-releaseyml
 #https://github.com/svenstaro/miniserve/blob/master/.github/workflows/build-release.yml
+env:
+  CICD_INTERMEDIATES_DIR: "_cicd-intermediates"
+  MSRV_FEATURES: --no-default-features --features minimal-application,bugreport,build-assets
 on:
   push:
     branches: [ main, master ]
