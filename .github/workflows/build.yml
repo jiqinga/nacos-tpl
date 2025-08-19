@@ -78,7 +78,6 @@ jobs:
           case ${{ matrix.job.target }} in
             arm-unknown-linux-*) sudo apt-get -y update ; sudo apt-get -y install gcc-arm-linux-gnueabihf ;;
             aarch64-unknown-linux-gnu) sudo apt-get -y update ; sudo apt-get -y install gcc-aarch64-linux-gnu ;;
-            *-pc-windows-*) cargo build --features vendored-openssl;;
           esac
 
       - name: 🦀 安装 Rust 工具链
@@ -109,8 +108,8 @@ jobs:
       - name: 🛠️ 构建
         shell: bash
         run: $BUILD_CMD build --locked --release --target=${{ matrix.job.target }}
-        env:
-          OPENSSL_NO_VENDOR: "1"
+#        env:
+#          OPENSSL_NO_VENDOR: "1"
       - name: 🏷️ 设置二进制名称与路径
         id: bin
         shell: bash
@@ -198,10 +197,23 @@ jobs:
         id: changelog
         uses: mikepenz/release-changelog-builder-action@v5
         with:
+          mode: "COMMIT"
           configurationJson: |
             {
               "template": "#{{CHANGELOG}}\n\n<details>\n<summary>Uncategorized</summary>\n\n#{{UNCATEGORIZED}}\n</details>",
               "categories": [
+                {
+                    "title": "## 🚀 Features",
+                    "labels": ["feature"]
+                },
+                {
+                    "title": "## 🐛 Fixes",
+                    "labels": ["fix"]
+                },
+                {
+                    "title": "## 🧪 Tests",
+                    "labels": ["test"]
+                },
                 {
                     "title": "## 💬 Other",
                     "labels": ["other"]
