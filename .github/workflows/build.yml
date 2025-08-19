@@ -76,10 +76,8 @@ jobs:
         shell: bash
         run: |
           case ${{ matrix.job.target }} in
-            arm-unknown-linux-*) sudo apt-get -y update ; sudo apt-get -y install gcc-arm-linux-gnueabihf pkg-config libssl-dev;;
-            aarch64-unknown-linux-gnu) sudo apt-get -y update ; sudo apt-get -y install gcc-aarch64-linux-gnu pkg-config libssl-dev;;
-            *-apple-darwin) brew install openssl;;
-            *-pc-windows-*) choco install vcpkg -y;  vcpkg install openssl;;
+            arm-unknown-linux-*) sudo apt-get -y update ; sudo apt-get -y install gcc-arm-linux-gnueabihf ;;
+            aarch64-unknown-linux-gnu) sudo apt-get -y update ; sudo apt-get -y install gcc-aarch64-linux-gnu ;;
           esac
 
       - name: 🦀 安装 Rust 工具链
@@ -110,7 +108,8 @@ jobs:
       - name: 🛠️ 构建
         shell: bash
         run: $BUILD_CMD build --locked --release --target=${{ matrix.job.target }}
-
+        env:
+          OPENSSL_NO_VENDOR: "1"
       - name: 🏷️ 设置二进制名称与路径
         id: bin
         shell: bash
