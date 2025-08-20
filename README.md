@@ -1,4 +1,4 @@
-# nacos-tpl（最小可用版）
+# nacos-tpl
 
 一个用于 Nacos 配置模板化与导入的 CLI。当前已支持：
 - 配置发现/合并（用户/项目/显式）与部分环境变量覆盖
@@ -10,45 +10,42 @@
 
 ## 安装与下载（GitHub Release） 📦
 
-你可以直接从 Release 页面下载各平台预编译二进制（已配好 CI 自动构建与发布）：
+你可以直接从 [Release](https://github.com/jiqinga/nacos-tpl/releases) 页面下载各平台预编译二进制：
 
-- Linux (glibc)：`nacos-tpl-vX.Y.Z-linux-x86_64.tar.gz` 🐧
-- Linux 静态（musl, x86_64）：`nacos-tpl-vX.Y.Z-linux-musl-x86_64.tar.gz` 🧱
-- Linux 静态（musl, arm64）：`nacos-tpl-vX.Y.Z-linux-musl-arm64.tar.gz` 🧱
-- macOS（根据 Runner 自动选择 arm64/x86_64）：`nacos-tpl-vX.Y.Z-darwin-<arch>.tar.gz` 🍎
-- Windows：`nacos-tpl-vX.Y.Z-windows-x86_64.zip` 🪟
 
 快速安装示例：
-
+nacos-tpl-v0.1.0-x86_64-pc-windows-msvc.zip
 ```bash
 # Linux (glibc)
 VERSION=vX.Y.Z
 curl -L -o nacos-tpl.tar.gz \
-  https://github.com/<your-org>/<your-repo>/releases/download/$VERSION/nacos-tpl-$VERSION-linux-x86_64.tar.gz
-mkdir -p ~/bin && tar -C ~/bin -xzf nacos-tpl.tar.gz
+  https://github.com/jiqinga/nacos-tpl/releases/download/$VERSION/nacos-tpl-$VERSION-x86_64-unknown-linux-gnu.tar.gz
+mkdir -p ~/bin 
+tar -C /tmp/ -xzf nacos-tpl.tar.gz
+mv /tmp/nacos-tpl-$VERSION-x86_64-unknown-linux-gnu/nacos-tpl ~/bin
 chmod +x ~/bin/nacos-tpl && export PATH=~/bin:$PATH
 nacos-tpl --help
 
 # Linux (musl 静态, x86_64) —— 更便于分发
+VERSION=vX.Y.Z
 curl -L -o nacos-tpl.tar.gz \
-  https://github.com/<your-org>/<your-repo>/releases/download/$VERSION/nacos-tpl-$VERSION-linux-musl-x86_64.tar.gz
-mkdir -p ~/bin && tar -C ~/bin -xzf nacos-tpl.tar.gz
+  https://github.com/jiqinga/nacos-tpl/releases/download/$VERSION/nacos-tpl-$VERSION-x86_64-unknown-linux-musl.tar.gz
+mkdir -p ~/bin 
+tar -C /tmp/ -xzf nacos-tpl.tar.gz
+mv /tmp/nacos-tpl-$VERSION-x86_64-unknown-linux-gnu/nacos-tpl ~/bin
 chmod +x ~/bin/nacos-tpl && export PATH=~/bin:$PATH
-
-# macOS（将 <arch> 替换为 arm64 或 x86_64）
-curl -L -o nacos-tpl.tar.gz \
-  https://github.com/<your-org>/<your-repo>/releases/download/$VERSION/nacos-tpl-$VERSION-darwin-<arch>.tar.gz
-sudo tar -C /usr/local/bin -xzf nacos-tpl.tar.gz
 nacos-tpl --help
 
-# Windows（PowerShell）
-$VERSION = "vX.Y.Z"
-Invoke-WebRequest -Uri "https://github.com/<your-org>/<your-repo>/releases/download/$VERSION/nacos-tpl-$VERSION-windows-x86_64.zip" -OutFile "nacos-tpl.zip"
-Expand-Archive -Path "nacos-tpl.zip" -DestinationPath "$env:USERPROFILE\bin" -Force
-$env:Path += ";$env:USERPROFILE\bin"; nacos-tpl.exe --help
+# macOS（ aarch64 或 x86_64）
+VERSION=vX.Y.Z
+curl -L -o nacos-tpl.tar.gz \
+  https://github.com/jiqinga/nacos-tpl/releases/download/$VERSION/nacos-tpl-$VERSION-x86_64-apple-darwin.tar.gz
+sudo tar -C /tmp/ -xzf nacos-tpl.tar.gz
+sudo mv  nacos-tpl-$VERSION-x86_64-unknown-linux-gnu/nacos-tpl /usr/local/bin
+sudo chmod +x /usr/local/bin/nacos-tpl
+nacos-tpl --help
 ```
 
-> 提示：以上示例中的 `<your-org>/<your-repo>` 请替换为你在 GitHub 的实际仓库路径。🚀
 
 ### 从源码构建（可选） 🛠️
 
@@ -57,67 +54,57 @@ cargo build --release
 # 生成的二进制：target/release/nacos-tpl
 ```
 
-### CI/Release 说明 🧰
 
-- GitHub Actions 工作流位于 `.github/workflows/build.yml`：
-  - Push/PR：自动在 Linux/macOS/Windows 构建并上传构建工件（Artifacts）。
-  - 打标签（`v*`）：自动创建 Release，并上传各平台归档：
-    - Linux glibc：`linux-x86_64`
-    - Linux 静态：`linux-musl-x86_64`、`linux-musl-arm64`
-    - macOS：`darwin-<arch>`
-    - Windows：`windows-x86_64`
-  - 归档命名：`nacos-tpl-<版本>-<平台>.{tar.gz|zip}`。
-  - 版本来源：打标签则使用标签名，否则使用 `v<Cargo.toml版本>-dev-<短SHA>`。
 
 ## Build & Run
 ```
 cargo run -- render -t examples/template -v examples/vars.yaml --print app.yaml --stdout
 
-# render single file to path
+# 将单文件渲染到指定路径 📄➡️📁
 cargo run -- render -t examples/template -v examples/vars.yaml --print app.yaml --output-file build/app.yaml
 
-# render single by dataId (requires manifest.yaml in template dir)
+# 按 dataId 渲染单个文件（模板目录需包含 manifest.yaml）🆔
 cargo run -- render -t template -v variables.yaml --print-id app.yaml --stdout
 cargo run -- render -t template -v variables.yaml --print-id app.yaml --group DEFAULT_GROUP --output-file build/app.yaml
-# If manifest.yaml is absent, print-id falls back to YAML front-matter in files (--- dataId/group ---)
+# 若缺少 manifest.yaml，则 print-id 回退到文件 YAML 头部（--- dataId/group ---）📜
 
-# render subset by globs (directory output)
+# 通过通配符选择子集（目录输出）🗂️
 cargo run -- render -t template -v variables.yaml -o build/dev --include "**/*.yml,**/*.properties" --exclude "**/test/**"
 
-# write manifest.yaml after directory render (for later selection by dataId)
+# 目录渲染后写出 manifest.yaml（供后续按 dataId 选择）📝
 cargo run -- render -t template -v variables.yaml -o build/dev --write-manifest
 
-# diff-remote: compare local vs remote (text-level)
+# diff-remote：对比本地与远端（文本级）🔍
 cargo run -- diff-remote -s http://127.0.0.1:8848 -n public -d build/dev --json --report dist/diff-report.json
 # JSON 报告包含 overall 计数、按组汇总（groups）以及按组的 changed/added 明细（groups_detail）
 
-# diff-remote with include/exclude filters
+# diff-remote 支持 include/exclude 过滤器 🔎
 cargo run -- diff-remote -s http://127.0.0.1:8848 -n public -d build/dev --include "**/*.yml" --exclude "**/test/**"
 
-# diff-remote show unified diffs for changed items
+# 展示统一 diff 的变更项 📘
 cargo run -- diff-remote -s http://127.0.0.1:8848 -n public -d build/dev --show-changed --context 5
 
-# diff-remote only print changed/added (omit summary)
+# 仅输出变更/新增（省略汇总）📝
 cargo run -- diff-remote -s http://127.0.0.1:8848 -n public -d build/dev --only-changed
 
-# diff-remote only print added items
+# 仅输出新增项 ➕
 cargo run -- diff-remote -s http://127.0.0.1:8848 -n public -d build/dev --only-added
 
-# diff-remote grouped listing
+# 按组列出清单 📂
 cargo run -- diff-remote -s http://127.0.0.1:8848 -n public -d build/dev --grouped
 
-# init (dir or zip input)
+# 初始化（目录或 zip 输入）🧭
 cargo run -- init -i examples/export_dir -o template/ -r mapping.rules.yaml
 cargo run -- init -i export.zip -o template/ -r mapping.rules.yaml
 
-# rules (JSON/YAML/properties path replace + regex for properties)
-# matcher example (YAML):
+# 规则（JSON/YAML/properties 路径替换 + properties 正则）📐
+# 匹配示例（YAML）：
 # - when:
 #     ext: yaml
 #     path_glob: "**/application*.yml"
 #   replace:
 #     spring.datasource.url: "${DB_URL}"
-# matcher example (properties + regex):
+# 匹配示例（properties + 正则）：
 # - when:
 #     ext: properties
 #   replace:
@@ -134,25 +121,25 @@ cargo run -- init -i export.zip -o template/ -r mapping.rules.yaml
 # 掩码关键字（可在 rules 顶层配置 mask_keywords）命中时，示例变量值将写为 ******
 # 说明：示例变量会自动生成；带敏感关键词（PASSWORD/SECRET/TOKEN/AK/SK/KEY）的变量将被掩码为 ******。
 
-# package -> zip for console import
+# 打包为 zip（控制台导入）📦
 cargo run -- package -t template/ -v examples/vars.yaml -o dist/dev.zip
 
-# apply via OpenAPI (retries/timeout/concurrency + JSON report)
+# 通过 OpenAPI 执行发布（重试/超时/并发 + JSON 报告）🚀
 cargo run -- apply -d build/dev -s http://127.0.0.1:8848 -n public \
   --skip-unchanged --retries 3 --timeout-ms 10000 --concurrency 5 \
   --json --report dist/apply-report.json --report-mode overwrite --fail-on-error
-  # append or timestamp modes:
+  # 追加或时间戳模式：
   # --report dist/apply-report.json --report-mode append
   # --report dist/apply-report.json --report-mode timestamp
-  # add --dry-run to only compute changes without posting
-  # nacos-tpl apply ... --dry-run
+  # 使用 --dry-run 仅计算变更、不实际发布 🧪
+  # 示例：nacos-tpl apply ... --dry-run
 
-# non-JSON output shows per-group summary and failed items list
+# 非 JSON 输出：显示按组汇总与失败清单 📊
 
-# validate (strict + required)
+# 校验（严格模式 + 必填）✅
 cargo run -- validate -t template/ -v variables.dev.yaml --strict -r mapping.rules.yaml
 
-# validate with JSON/report
+# 校验并生成 JSON 报告 🧾
 cargo run -- validate -t template/ -v variables.dev.yaml --json --report dist/validate-report.json
 ```
 
@@ -243,10 +230,6 @@ cargo run -- apply -s http://127.0.0.1:8848 -n public -d build/dev \
 - 质量选项：`--normalize-lf` 统一换行、`--max-bytes` 限制单项大小（字节）。📏
  - 报告增强：`--include-md5` 在 JSON 报告的条目中包含 `localMd5` 与 `sizeBytes`。🧮
 
-### 本地启动 Nacos（可选）
-- 使用 Docker Compose：`docker compose -f scripts/compose/local.yaml up -d`
-- 控制台：`http://127.0.0.1:8848/nacos`（默认账号/密码：`nacos/nacos`）
-- 环境变量：`NACOS_TPL_SERVER=http://127.0.0.1:8848`，`NACOS_TPL_NAMESPACE=public`
 
 ## 环境变量（覆盖优先级说明） 🔧
 - 覆盖链：命令行 > 环境变量（本节） > 项目配置 > 用户配置 > 内置默认
@@ -262,7 +245,7 @@ cargo run -- apply -s http://127.0.0.1:8848 -n public -d build/dev \
   - `NACOS_TPL_TLS_CA_CERT`：自定义 CA 证书路径。
   - `NACOS_TPL_RENDER_VARIABLES_FILE`：`render` 的默认变量文件路径。
   - `NACOS_TPL_RENDER_STDOUT`：单文件渲染默认输出到 stdout（`true|false`）。
- - `NACOS_TPL_INIT_EXAMPLE_FILE`：`init` 生成示例变量文件名。
+  - `NACOS_TPL_INIT_EXAMPLE_FILE`：`init` 生成示例变量文件名。
 
 ## 本地上传/对比筛选规则（.metadata.yml）🧩
 - 放置位置：渲染输出目录根（例如 `build/dev/.metadata.yml`）。
@@ -282,13 +265,4 @@ metadata:
   - 若检测到 `.metadata.yml` 且包含 `metadata` 列表，则仅处理其中列出的 `(group, dataId)` 条目（白名单）。✅
   - 始终跳过控制文件：`.metadata.yml/.yaml`、`manifest.yml/.yaml`。🚫
   - `diff-remote` 除遵循上述白名单外，仍可额外叠加 `--include/--exclude` 进行二次过滤（相对目录的 glob）。🎯
-  - `apply` 不提供命令行 include/exclude，专注遵循 `.metadata.yml` 和默认忽略规则（KISS）。
-
-## 公共筛选模块（开发者说明）🧱
-- 模块位置：`src/common/selector.rs`
-- 主要接口：
-  - `collect_upload_candidates(dir, includes, excludes, use_allow_set) -> Vec<PathBuf>`：收集需要参与上传/对比的文件；`use_allow_set=true` 时启用 `.metadata.yml` 白名单。
-  - `derive_group_and_dataid(root, file) -> (String, String)`：从路径推导 `group/dataId`（`<root>/<GROUP>/<DATAID>`）。
-- 复用点：
-  - `apply`：统一使用 `collect_upload_candidates(dir, [], [], true)` 收集候选后再并发发布。
-  - `diff-remote`：使用 `collect_upload_candidates(dir, includes, excludes, true)` 收集候选后对比远端文本。
+ 
