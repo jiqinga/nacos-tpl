@@ -19,7 +19,7 @@ jobs:
     name: 提取元数据
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: 提取 Crate 元数据
         id: crate_metadata
         run: |
@@ -41,7 +41,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - run: cargo fmt -- --check
 
   build:
@@ -70,7 +70,7 @@ jobs:
       BUILD_CMD: cargo
     steps:
       - name: 📥 检出代码
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: 🔧 安装前置依赖
         shell: bash
