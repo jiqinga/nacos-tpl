@@ -8,6 +8,10 @@
 - `apply`（OpenAPI 发布）与 `package`（zip 打包）基础流程
 - `diff-remote`（远端对比 same/changed/added + 可选统一 diff）
 
+<p align="center">
+  <img src="https://count.getloli.com/get/@jiqinga.nacos-tpl?theme=rule34" alt="Visitors">
+</p>
+
 ## 安装与下载（GitHub Release） 📦
 
 你可以直接从 [Release](https://github.com/jiqinga/nacos-tpl/releases) 页面下载各平台预编译二进制：
