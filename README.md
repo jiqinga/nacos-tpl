@@ -1,5 +1,17 @@
 # nacos-tpl
 
+<!-- Keep these links. Translations will automatically update with the README. -->
+[Deutsch](https://zdoc.app/de/jiqinga/nacos-tpl) | 
+[English](https://zdoc.app/en/jiqinga/nacos-tpl) | 
+[Español](https://zdoc.app/es/jiqinga/nacos-tpl) | 
+[français](https://zdoc.app/fr/jiqinga/nacos-tpl) | 
+[日本語](https://zdoc.app/ja/jiqinga/nacos-tpl) | 
+[한국어](https://zdoc.app/ko/jiqinga/nacos-tpl) | 
+[Português](https://zdoc.app/pt/jiqinga/nacos-tpl) | 
+[Русский](https://zdoc.app/ru/jiqinga/nacos-tpl) | 
+[中文](https://zdoc.app/zh/jiqinga/nacos-tpl)
+
+
 一个用于 Nacos 配置模板化与导入的 CLI。当前已支持：
 - 配置发现/合并（用户/项目/显式）与部分环境变量覆盖
 - `render` 渲染（Tera + 兼容 `${VAR}` 语法）
